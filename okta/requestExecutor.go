@@ -434,6 +434,9 @@ func CheckResponseForError(resp *http.Response) error {
 	_ = resp.Body.Close()
 	resp.Body = ioutil.NopCloser(bytes.NewBuffer(bodyBytes))
 	_ = json.NewDecoder(bytes.NewReader(copyBodyBytes)).Decode(&e)
+	if statusCode == http.StatusInternalServerError {
+		e.ErrorSummary += fmt.Sprintf(", x-okta-request-id=%s", resp.Header.Get("x-okta-request-id"))
+	}
 	return &e
 }
 
